@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:v2.5
+    ports:
+      - 80:80
+      - 443:443
+    env_file:
+      - .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/traefik.yml:ro
+
+  server:
+    build: ./server
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.turvalisus.entrypoints=http"
+      - "traefik.http.routers.turvalisus.rule=Host(`${SIM_HOST}`)"
+    expose:
+      - 8080
